@@ -1,11 +1,157 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#101820"><title>Flatline Racer</title>
 <style>
-:root{--ink:#101820;--panel:#182632;--lime:#c7f464;--muted:#9fb0ba}*{box-sizing:border-box}body{margin:0;background:var(--ink);color:#f4f7f8;font:600 14px system-ui,sans-serif;overflow:hidden}#game{position:fixed;inset:0;width:100%;height:100%;display:block}.hud{position:fixed;inset:12px 12px auto;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#182632ef;border:1px solid #ffffff20;border-radius:12px;padding:9px 13px}.big{font-size:22px;color:var(--lime);font-weight:900}.small{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}.controls{position:fixed;left:0;right:0;bottom:12px;display:flex;align-items:end;justify-content:space-between;padding:0 14px;gap:12px;pointer-events:none}.group{pointer-events:auto;display:flex;align-items:center;gap:6px}.stack{display:flex;flex-direction:column;gap:7px}button{border:1px solid #ffffff2a;background:#182632;color:#f4f7f8;border-radius:10px;padding:12px 10px;font:800 12px system-ui;min-width:38px;touch-action:none}button.active{background:var(--lime);color:#101820;border-color:var(--lime)}button.action{min-width:60px;height:48px}#wheel{width:110px;height:110px;border:9px solid #dce5e8;border-radius:50%;background:#182632aa;position:relative;touch-action:none;box-shadow:0 4px 24px #0005}#wheel:before{content:"";position:absolute;width:10px;height:42px;background:#dce5e8;left:41px;top:0;border-radius:5px}#wheel:after{content:"";position:absolute;width:68px;height:9px;background:#dce5e8;left:12px;top:46px;border-radius:5px}.wheelhub{position:absolute;width:24px;height:24px;background:var(--lime);border:5px solid #182632;border-radius:50%;left:34px;top:34px;z-index:2}#hint{position:fixed;top:78px;left:50%;transform:translateX(-50%);background:#182632cc;padding:7px 12px;border-radius:99px;color:#dce5e8;font-size:11px;white-space:nowrap;pointer-events:none}@media(max-width:520px){.controls{padding:0 7px;bottom:8px}.pill{padding:7px 9px}.big{font-size:18px}#wheel{width:88px;height:88px;border-width:8px}#wheel:before{left:32px;height:32px}#wheel:after{width:56px;left:8px;top:37px}.wheelhub{left:26px;top:26px}button{font-size:10px;padding:10px 7px}button.action{min-width:51px;height:44px}.group{gap:4px}}
+:root{--ink:#101820;--panel:#182632;--lime:#c7f464;--muted:#9fb0ba}*{box-sizing:border-box}body{margin:0;background:var(--ink);color:#f4f7f8;font:600 14px system-ui,sans-serif;overflow:hidden}#game{position:fixed;inset:0;width:100%;height:100%;display:block}.hud{position:fixed;inset:12px 12px auto;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{background:#182632ef;border:1px solid #ffffff20;border-radius:12px;padding:9px 13px}.big{font-size:22px;color:var(--lime);font-weight:900}.small{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}.controls{position:fixed;left:0;right:0;bottom:12px;display:flex;align-items:end;justify-content:space-between;padding:0 14px;gap:12px;pointer-events:none}.group{pointer-events:auto;display:flex;align-items:center;gap:6px}.stack{display:flex;flex-direction:column;gap:7px}button{border:1px solid #ffffff2a;background:#182632;color:#f4f7f8;border-radius:10px;padding:12px 10px;font:800 12px system-ui;min-width:38px;touch-action:none}button.active{background:var(--lime);color:#101820;border-color:var(--lime)}button.action{min-width:60px;height:48px}#wheel{width:40vw;height:40vw;max-width:180px;max-height:180px;min-width:112px;min-height:112px;position:fixed;left:5vw;bottom:10vh;z-index:5;touch-action:none;user-select:none;cursor:grab;transform-origin:center center}#steeringWheelSvg{width:100%;height:100%;display:block;opacity:.78;fill:#101820;touch-action:none;user-select:none;pointer-events:none}#wheel:active{cursor:grabbing}.wheelhub{display:none}#hint{position:fixed;top:78px;left:50%;transform:translateX(-50%);background:#182632cc;padding:7px 12px;border-radius:99px;color:#dce5e8;font-size:11px;white-space:nowrap;pointer-events:none}@media(max-width:520px){.controls{padding:0 7px;bottom:8px}.pill{padding:7px 9px}.big{font-size:18px}#wheel{width:40vw;height:40vw;min-width:112px;min-height:112px;max-width:160px;max-height:160px;left:5vw;bottom:10vh}button{font-size:10px;padding:10px 7px}button.action{min-width:51px;height:44px}.group{gap:4px}}
 </style></head><body><canvas id="game"></canvas>
 <div class="hud"><div class="pill"><div class="small">FLATLINE / STREET RUN</div><div class="big">RACER</div></div><div class="pill" style="text-align:right"><div class="small">Speed</div><div class="big"><span id="speed">0</span> <span style="font-size:10px">KM/H</span></div></div><div class="pill" style="text-align:right"><div class="small">Distance</div><div class="big"><span id="distance">0.0</span><span style="font-size:10px"> KM</span></div></div></div>
 <div id="hint">HOLD FORWARD TO DRIVE · DRAG THE WHEEL TO STEER</div>
-<div class="controls"><div class="group"><div id="wheel"><div class="wheelhub"></div></div></div><div class="stack"><div class="group" id="speeds"><button class="speed active" data-speed="1">1</button><button class="speed" data-speed="2">2</button><button class="speed" data-speed="3">3</button><button class="speed" data-speed="4">4</button><button class="speed" data-speed="8">8</button></div><div class="group"><button class="action" id="forward">▲ GO</button><button class="action" id="brake">■ BRAKE</button><button class="action" id="reverse">▼ BACK</button></div></div></div>
+<div class="controls"><div class="group"><div id="wheel" aria-label="Interactive steering wheel"><svg
+   width="89.999672mm"
+   height="90.000191mm"
+   viewBox="0 0 89.999672 90.000191"
+   version="1.1"
+   id="poster-h"
+   sodipodi:docname="h.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2"
+     inkscape:cx="170.25"
+     inkscape:cy="184.75"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient2"
+       inkscape:swatch="gradient">
+      <stop
+         style="stop-color:#947a58;stop-opacity:1;"
+         offset="0"
+         id="stop2" />
+      <stop
+         style="stop-color:#947a58;stop-opacity:0;"
+         offset="1"
+         id="stop3" />
+    </linearGradient>
+  </defs>
+  <g
+     id="layer1"
+     transform="translate(-14.171229,-13.580567)">
+    <path
+       id="rect1"
+       style="stroke-width:0;stroke-linecap:round;stroke-dasharray:none"
+       d="M 14.171228,13.580566 V 103.58076 H 44.185417 V 73.81875 h 30.000236 v 29.76201 H 104.1709 V 13.580566 H 74.411479 v 29.93254 h -29.99972 v -29.93254 z" />
+  </g>
+
+</svg>
+
+</div>
+
+  
+  
+
+
+
+
+
+<!-- Mobile / Touch Controls Overlay -->
+<!-- One-Touch Driving Controls Overlay -->
+<div id="driveControls">
+  
+
+  <button id="btnStop" class="drive-btn stop-btn quantum">🛑 STOP</button>
+  <button id="btnReverse" class="drive-btn quantum">▼ REVERSE</button>
+</div>
+
+
+<!-- Gear Selection Dashboard -->
+<div id="gearBox">
+  <span class="gear-label">speed</span>
+  <button class="gear-btn active" data-speed=".1">1</button>
+  <button class="gear-btn" data-speed=".2">2</button>
+  <button class="gear-btn" data-speed=".3">3</button>
+  <button class="gear-btn" data-speed=".4">4</button>
+  <button class="gear-btn" data-speed=".8">8</button>
+  
+  
+</div>
+
+
+  
+  <div id="car">
+      
+
+  <div id="rearTyre1"></div>
+
+  <div id="rearTyre2"></div>
+
+   <div id="frontTyre1"></div>
+
+  <div id="frontTyre2"></div>
+  <div id="carBody"></div>
+    
+ 
+</div>
+
+  
+  </div>
+
+
+  <!-- Interactive Steering Wheel Group - Center point: (100, 40) -->
+ 
+
+
+
+
+  
+ 
+  
+
+
+<!-- Fullscreen flash warning layer -->
+<div id="flashOverlay"></div>
+      
+      
+
+<button id="btnForward" onclick="instructionsDis()">
+
+  <svg
+   width="141.6324mm"
+   height="142.06676mm"
+   viewBox="0 0 141.6324 142.06676"
+   version="1.1"
+   id="steeringWheelSvg"
+   xml:space="preserve"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs1" /><g
+     id="layer1"
+     transform="translate(-1.2507651,-1.1968217)"><path
+       id="path3"
+       style="stroke-width:0.609686"
+       d="m 71.561319,1.1968262 c -0.05613,1.95e-5 -0.112346,3.601e-4 -0.168465,5.167e-4 0.07129,0.014334 0.13906,0.037846 0.202055,0.069246 C 56.526242,1.4647219 42.01771,6.3618 29.978328,15.32723 25.040028,19.004676 20.062685,23.911034 16.28459,28.825114 8.3495604,39.14596 3.4415293,51.094715 1.7655793,64.170243 c -1.64848991,12.86121 0.6987143,26.956171 6.5138143,39.114407 6.8155394,14.25003 18.6559524,26.12385 32.8372724,32.92874 5.983153,2.87101 12.657758,4.9805 19.096509,6.08697 0.0068,10e-4 0.01336,0.003 0.02015,0.004 2.528229,0.43366 5.020129,0.71258 7.419186,0.82217 0.31548,0.0144 0.333444,-0.007 0.61805,0.006 0.02176,0.001 0.04284,0.006 0.0646,0.007 0.106061,0.005 0.221441,-0.008 0.323495,-0.003 3.085624,0.12856 4.799183,0.17736 7.140133,0.0667 2.73635,-0.1294 5.448165,-0.40991 8.123535,-0.83819 h -0.766879 c 6.673299,-1.06721 13.641239,-3.22914 19.861835,-6.21409 14.18132,-6.80489 26.02173,-18.67871 32.83727,-32.92874 5.8151,-12.15824 8.16231,-26.253199 6.51382,-39.114409 -1.67595,-13.075528 -6.58398,-25.024283 -14.51901,-35.345129 -3.7781,-4.91408 -8.75544,-9.820438 -13.69374,-13.497884 C 101.85606,6.1044498 86.979447,1.191461 71.561319,1.1968262 Z M 72.098237,13.19196 c 2.471451,-1.64e-4 4.85513,0.128082 6.799585,0.392224 7.391818,1.00412 13.264978,2.785623 19.534725,5.925736 4.771383,2.389671 8.935173,5.231918 11.636503,7.942668 0.65156,0.653832 2.37214,2.968998 3.20342,4.310848 1.06647,1.721492 1.39254,2.281363 4.51135,7.739579 0.22555,0.39473 0.5574,0.883452 0.73691,1.086239 0.17949,0.202789 0.46088,0.586496 0.6258,0.852661 0.37677,0.608112 2.2759,2.892221 3.55327,4.273641 4.00697,4.333351 4.91937,5.792489 5.6565,9.045443 0.43713,1.929058 0.45477,2.458655 0.10801,3.239078 -0.74784,1.683037 -2.24749,2.611353 -4.72323,2.923853 -1.32239,0.166914 -1.57407,0.150612 -3.0179,-0.193787 -1.68672,-0.402338 -2.13941,-0.576688 -2.13941,-0.824239 0,-0.08596 -0.48321,-1.140096 -1.07383,-2.342493 -0.80794,-1.644823 -1.23587,-2.324714 -1.72755,-2.745568 -0.72813,-0.623257 -2.22868,-1.154115 -3.69538,-1.307414 -1.1001,-0.114987 -1.61834,0.09626 -1.89911,0.774113 -0.16661,0.402246 -0.1079,0.690355 0.47749,2.339909 0.3672,1.034718 0.63937,1.909315 0.60462,1.944067 -0.0684,0.06838 -4.62711,-0.838288 -7.35976,-1.463993 -0.23593,-0.05402 -0.43929,-0.100073 -0.61547,-0.138493 l 5.2e-4,-0.03411 -8.773625,-2.077909 C 93.985072,54.685775 93.39353,54.520963 92.732637,54.353788 88.547102,53.295032 82.501555,52.123296 78.497847,51.594784 76.971513,51.393303 74.49159,51.297861 72.035709,51.308496 v 0.06305 c -2.43537,-0.0088 -4.886235,0.08703 -6.39961,0.286805 -4.00371,0.528512 -10.04926,1.700248 -14.23479,2.759004 -0.6609,0.167175 -1.252438,0.33199 -1.789038,0.500228 l -8.773624,2.077909 5.16e-4,0.03411 c -0.17618,0.03842 -0.379536,0.08447 -0.615466,0.138493 -2.73265,0.625705 -7.291357,1.532373 -7.359757,1.463993 -0.03475,-0.03475 0.237414,-0.909349 0.604614,-1.944067 0.58539,-1.649554 0.6441,-1.937663 0.47749,-2.339909 -0.28077,-0.677853 -0.799009,-0.8891 -1.899109,-0.774113 -1.4667,0.1533 -2.967252,0.684157 -3.695382,1.307414 -0.49168,0.420854 -0.919603,1.100745 -1.727543,2.745568 -0.59062,1.202397 -1.073836,2.256533 -1.073836,2.342493 0,0.247551 -0.452684,0.421901 -2.139404,0.824239 -1.44383,0.344399 -1.695514,0.360701 -3.017904,0.193787 -2.475735,-0.3125 -3.975386,-1.240816 -4.723226,-2.923853 -0.34676,-0.780423 -0.329126,-1.31002 0.108004,-3.239078 0.73713,-3.252954 1.649537,-4.712092 5.656502,-9.045443 1.27737,-1.38142 3.176502,-3.665529 3.553272,-4.273641 0.16492,-0.266165 0.446311,-0.649872 0.625801,-0.852661 0.17951,-0.202788 0.511356,-0.691509 0.736906,-1.086239 3.11881,-5.458216 3.444883,-6.018087 4.511353,-7.739579 0.83128,-1.34185 2.551862,-3.657016 3.203422,-4.310848 2.70133,-2.71075 6.865109,-5.552997 11.636499,-7.942668 6.26974,-3.140113 12.142905,-4.921616 19.534725,-5.925736 1.96086,-0.266369 4.368353,-0.394524 6.862113,-0.392224 z m 52.644853,69.097591 h 5.1e-4 c 0.0808,0.02881 0.16317,0.04547 0.23823,0.04547 0.92105,0 2.49502,1.216234 3.02824,2.339909 0.32564,0.686244 0.61845,2.920591 0.42995,3.279903 -0.0773,0.147257 -0.19203,0.594486 -0.2558,0.993738 -0.1867,1.16892 -1.12677,3.761765 -2.54403,7.017143 -1.62249,3.726769 -4.19127,8.266126 -6.67505,11.795656 -2.16678,3.07908 -7.92357,8.82222 -11.4887,11.46183 -5.11943,3.79038 -11.673599,7.27984 -14.944825,7.95662 -0.532328,0.11014 -1.221681,0.26364 -1.532206,0.34107 -1.073382,0.26764 -2.906933,0.003 -4.00544,-0.57774 -0.701846,-0.37114 -1.640727,-1.31612 -1.640727,-1.65158 0,-0.14532 -0.122716,-0.39995 -0.272851,-0.56586 -0.247917,-0.27394 -0.254379,-0.4508 -0.06976,-1.93011 0.259018,-2.07543 1.537798,-9.99527 1.870687,-11.58586 0.818515,-3.91104 2.867399,-7.89847 5.490621,-10.68514 1.263214,-1.3419 4.402307,-5.598691 6.122107,-8.30181 0.942077,-1.48075 2.814834,-3.410931 4.261234,-4.391464 1.16608,-0.790519 2.8329,-1.591503 4.37544,-2.10323 0.95215,-0.315866 6.19288,-1.454 10.48515,-2.277381 0.75595,-0.145014 1.43194,-0.329615 1.83865,-0.495577 2.8e-4,-1.14e-4 7.5e-4,-4.02e-4 0.001,-5.17e-4 z m -105.352747,0.06356 h 5.17e-4 l 5.287533,0.665075 c 2.5e-4,1.16e-4 7.53e-4,4.03e-4 0.001,5.17e-4 0.40671,0.165961 1.082698,0.350563 1.838648,0.495577 4.29227,0.823382 9.532998,1.961515 10.485148,2.277381 1.54254,0.511726 3.209363,1.31271 4.375443,2.10323 1.4464,0.980532 3.319159,2.910714 4.261239,4.391464 1.7198,2.70312 4.858897,6.959907 6.122107,8.301825 2.62323,2.78667 4.672111,6.77409 5.490621,10.68513 0.33289,1.59059 1.611667,9.51043 1.870687,11.58586 0.18458,1.47931 0.178156,1.65617 -0.06976,1.93011 -0.15013,0.1659 -0.272851,0.42054 -0.272851,0.56586 0,0.33546 -0.938877,1.28044 -1.640727,1.65158 -1.0985,0.58074 -2.93205,0.84538 -4.00544,0.57774 -0.31052,-0.0774 -0.999876,-0.23092 -1.532206,-0.34106 -3.27123,-0.67678 -9.825395,-4.16624 -14.944825,-7.95662 -3.56513,-2.63961 -9.321924,-8.38276 -11.488704,-11.46184 -2.48378,-3.52953 -5.05256,-8.068892 -6.675045,-11.795661 -1.41726,-3.255379 -2.357331,-5.848223 -2.544031,-7.017143 -0.06377,-0.399251 -0.178498,-0.846481 -0.255798,-0.993738 -0.1885,-0.359312 0.104308,-2.593658 0.429948,-3.279903 0.53322,-1.123675 2.107194,-2.339909 3.028239,-2.339909 0.07506,0 0.157428,-0.01667 0.238228,-0.04548 z m 57.882772,36.448939 v 5.2e-4 c 2.416819,0.008 2.235347,0.26426 1.887223,1.38338 -0.408374,1.31278 -0.87997,2.10533 -1.373042,2.30735 -0.230571,0.0945 -0.963425,0.24166 -1.628842,0.32711 v -5.2e-4 c -0.659242,0.0847 -2.363812,0.12976 -4.122745,0.13436 v 0.0636 c -1.736664,-0.005 -3.408784,-0.0507 -4.060218,-0.13435 v 5.1e-4 c -0.66541,-0.0855 -1.398271,-0.23261 -1.628841,-0.32711 -0.49308,-0.20202 -0.964663,-0.99457 -1.373043,-2.30735 -0.34812,-1.11912 -0.529596,-1.37538 1.887224,-1.38338 v -5.2e-4 c 0.80561,-0.003 1.899981,0.0223 3.372921,0.0517 0.60945,0.0122 1.240245,0.0238 1.864485,0.0346 v -0.0646 c 0.60379,-0.0105 1.212858,-0.0218 1.801957,-0.0336 1.47294,-0.0294 2.567315,-0.0544 3.372921,-0.0517 z" /><circle
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:1.09743;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       id="path4"
+       cx="72.29332"
+       cy="72.056686"
+       r="15.909609" /></g></svg></div></div><div class="stack"><div class="group" id="speeds"><button class="speed active" data-speed="1">1</button><button class="speed" data-speed="2">2</button><button class="speed" data-speed="3">3</button><button class="speed" data-speed="4">4</button><button class="speed" data-speed="8">8</button></div><div class="group"><button class="action" id="forward">▲ GO</button><button class="action" id="brake">■ BRAKE</button><button class="action" id="reverse">▼ BACK</button></div></div></div>
 <script>
 (function(){
 const c=document.getElementById('game'),x=c.getContext('2d'),$=id=>document.getElementById(id);let W,H,dpr,steer=0,angle=0,gear=1,speed=0,dist=0,scroll=0,carX=0,go=false,brake=false,back=false,traffic=[],spawn=0;
@@ -13,10 +159,10 @@ function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight
 function road(){return{cx:W/2,top:W<600?W*.31:W*.22,bottom:W<600?W*.88:W*.68}}
 function drawCar(px,py,w,h,color,player){x.save();x.translate(px,py);x.fillStyle='#071018';x.fillRect(-w*.53,-h*.43,w*1.06,h*.86);x.fillStyle=color;x.fillRect(-w/2,-h/2,w,h);x.fillStyle=player?'#9ce8ed':'#a6c4d0';x.fillRect(-w*.34,-h*.27,w*.68,h*.24);x.fillStyle='#172b38';x.fillRect(-w*.34,h*.04,w*.68,h*.26);x.fillStyle='#f8e9a1';x.fillRect(-w*.4,-h*.46,w*.2,h*.07);x.fillRect(w*.2,-h*.46,w*.2,h*.07);x.fillStyle='#f15b55';x.fillRect(-w*.4,h*.39,w*.2,h*.07);x.fillRect(w*.2,h*.39,w*.2,h*.07);x.restore()}
 function draw(){x.clearRect(0,0,W,H);let r=road();x.fillStyle='#7bbd73';x.fillRect(0,0,W,H);for(let i=0;i<9;i++){let bw=28+(i*17)%45,xx=(i*97+20)%W;x.fillStyle=i%2?'#559b68':'#649f70';x.fillRect(xx,0,bw,H*.18)}x.fillStyle='#d9d2b0';x.fillRect(r.cx-r.bottom/2-13,0,r.bottom+26,H);x.fillStyle='#3f484e';x.beginPath();x.moveTo(r.cx-r.top/2,0);x.lineTo(r.cx+r.top/2,0);x.lineTo(r.cx+r.bottom/2,H);x.lineTo(r.cx-r.bottom/2,H);x.closePath();x.fill();x.strokeStyle='#f4e7bd';x.lineWidth=4;x.beginPath();x.moveTo(r.cx-r.top/2,0);x.lineTo(r.cx-r.bottom/2,H);x.moveTo(r.cx+r.top/2,0);x.lineTo(r.cx+r.bottom/2,H);x.stroke();let lane=r.bottom/3;for(let n=1;n<=2;n++)for(let y=-70+(scroll%100);y<H;y+=100){let t=y/H,half=r.top/2+(r.bottom-r.top)*t/2,xx=r.cx+(n-1.5)*2*half/3;x.strokeStyle='#d8d8c7';x.lineWidth=3;x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+42*(.3+t));x.stroke()}for(let y=-40+(scroll%90);y<H;y+=90)for(let s of [-1,1]){x.fillStyle='#f4e7bd';x.fillRect(r.cx+s*(r.bottom/2+7),y,7,24)}traffic.forEach(t=>drawCar(r.cx+t.x*lane,H*t.y,Math.max(24,lane*.43),Math.max(42,lane*.78),t.color,false));drawCar(r.cx+carX*lane,H*.75,Math.max(30,lane*.48),Math.max(52,lane*.88),'#c7f464',true)}
-function tick(){let target=back?-gear*13:brake?0:go?gear*17:0;speed+=(target-speed)*.045;scroll+=Math.abs(speed)*.12;dist+=Math.max(0,speed)*.000008;spawn+=Math.abs(speed)*.001;if(spawn>2.2){spawn=0;traffic.push({x:Math.floor(Math.random()*3)-1,y:-.2,color:['#ff715b','#4aa9d8','#f3c969','#b28be0'][Math.floor(Math.random()*4)]})}traffic.forEach(t=>t.y+=.004+Math.abs(speed)*.00012);traffic=traffic.filter(t=>t.y<1.2);traffic.forEach(t=>{if(Math.abs(t.x-carX)<.42&&Math.abs(t.y-.75)<.10)speed*=.94});carX=Math.max(-1,Math.min(1,carX+steer*.012));draw();$('speed').textContent=Math.round(Math.abs(speed)*3.2);$('distance').textContent=dist.toFixed(1);requestAnimationFrame(tick)}tick();
+function tick(){let target=back?-gear*13:brake?0:go?gear*17:0;speed+=(target-speed)*.045;scroll+=Math.abs(speed)*.12;dist+=Math.max(0,speed)*.000008;spawn+=Math.abs(speed)*.001;if(spawn>2.2){spawn=0;traffic.push({x:Math.floor(Math.random()*3)-1,y:-.2,color:['#ff715b','#4aa9d8','#f3c969','#b28be0'][Math.floor(Math.random()*4)]})}traffic.forEach(t=>t.y+=.004+Math.abs(speed)*.00012);traffic=traffic.filter(t=>t.y<1.2);traffic.forEach(t=>{if(Math.abs(t.x-carX)<.42&&Math.abs(t.y-.75)<.10)speed*=.94});carX=Math.max(-1,Math.min(1,carX+steer*(speed/136)*.004));draw();$('speed').textContent=Math.round(Math.abs(speed)*3.2);$('distance').textContent=dist.toFixed(1);requestAnimationFrame(tick)}tick();
 function gearSet(v){gear=v;document.querySelectorAll('.speed').forEach(b=>b.classList.toggle('active',+b.dataset.speed===v))}document.querySelectorAll('.speed').forEach(b=>b.addEventListener('click',()=>gearSet(+b.dataset.speed)));
 function hold(id,fn){let b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(true)});['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>fn(false)))}hold('forward',v=>go=v);hold('brake',v=>brake=v);hold('reverse',v=>back=v);
-let wheel=$('wheel'),drag=false,last=0;wheel.addEventListener('pointerdown',e=>{drag=true;last=e.clientX;wheel.setPointerCapture(e.pointerId)});wheel.addEventListener('pointermove',e=>{if(!drag)return;angle=Math.max(-100,Math.min(100,angle+(e.clientX-last)*1.4));last=e.clientX;steer=Math.max(-1,Math.min(1,angle/100));wheel.style.transform='rotate('+angle+'deg)'});function end(){drag=false;steer=0;angle*=.65;wheel.style.transform='rotate('+angle+'deg)'}wheel.addEventListener('pointerup',end);wheel.addEventListener('pointercancel',end);
-let keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();if('12348'.includes(e.key))gearSet(+e.key)});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);function keyboard(){if(keys.arrowleft||keys.a){steer=-1;angle=-65;wheel.style.transform='rotate(-65deg)'}else if(keys.arrowright||keys.d){steer=1;angle=65;wheel.style.transform='rotate(65deg)'}else if(!drag){steer=0;angle*=.8;wheel.style.transform='rotate('+angle+'deg)'}brake=!!(keys[' ']||keys.q);back=!!(keys.arrowdown||keys.s);go=!!(keys.arrowup||keys.w);if(go)back=false;requestAnimationFrame(keyboard)}keyboard();
+let wheel=$('wheel'),drag=false,startAngle=0,currentRotation=0;const MAX_STEER_LIMIT=360;function pointerAngle(e){const rect=wheel.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;return Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI}wheel.addEventListener('pointerdown',e=>{e.preventDefault();drag=true;startAngle=pointerAngle(e);wheel.setPointerCapture(e.pointerId)});wheel.addEventListener('pointermove',e=>{if(!drag)return;let a=pointerAngle(e),delta=a-startAngle;if(delta>180)delta-=360;if(delta<-180)delta+=360;currentRotation=Math.max(-MAX_STEER_LIMIT,Math.min(MAX_STEER_LIMIT,currentRotation+delta));startAngle=a;angle=currentRotation;steer=currentRotation/MAX_STEER_LIMIT;wheel.style.transform='rotate('+currentRotation+'deg)'});function end(){drag=false}wheel.addEventListener('pointerup',end);wheel.addEventListener('pointercancel',end);wheel.addEventListener('lostpointercapture',end);
+let keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();if('12348'.includes(e.key))gearSet(+e.key)});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);function keyboard(){if(keys.arrowleft||keys.a){currentRotation=Math.max(-360,currentRotation-4);angle=currentRotation;steer=currentRotation/360;wheel.style.transform='rotate('+currentRotation+'deg)'}else if(keys.arrowright||keys.d){currentRotation=Math.min(360,currentRotation+4);angle=currentRotation;steer=currentRotation/360;wheel.style.transform='rotate('+currentRotation+'deg)'}brake=!!(keys[' ']||keys.q);back=!!(keys.arrowdown||keys.s);go=!!(keys.arrowup||keys.w);if(go)back=false;requestAnimationFrame(keyboard)}keyboard();
 })();
 </script></body></html>
